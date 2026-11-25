@@ -1,0 +1,99 @@
+@startuml UC-overview
+' 纯 Java 布局，不依赖 Graphviz
+!pragma layout smetana
+title 用例图：基于 RAG 的校园学习生活信息问答系统（SRS v0.1 草稿）
+skinparam shadowing false
+skinparam packageStyle rectangle
+skinparam defaultFontName PingFang SC
+
+actor "访客" as Visitor
+actor "普通用户\n(学生 / 教职工)" as User
+actor "活动组织者" as Organizer
+actor "知识库管理员" as KBAdmin
+actor "系统管理员" as SysAdmin
+actor "统一身份认证" as IdP <<external>>
+actor "地图服务" as Map <<external>>
+actor "消息推送" as Push <<external>>
+actor "大模型服务" as LLM <<external>>
+actor "定时任务" as Timer
+
+rectangle "校园学习生活信息问答系统" {
+  package "账号与权限" {
+    usecase "UC-01\n统一身份认证登录" as UC01
+    usecase "UC-02\n访客浏览" as UC02
+    usecase "UC-03\n角色权限管理" as UC03
+    usecase "UC-04\n问答历史管理" as UC04
+  }
+  package "知识采集与治理" {
+    usecase "UC-05\n活动 / 讲座发布" as UC05
+    usecase "UC-06\n信息纠错提交" as UC06
+    usecase "UC-07\n文档批量导入" as UC07
+    usecase "UC-08\n文档解析与切片" as UC08
+    usecase "UC-09\n知识条目审核发布" as UC09
+    usecase "UC-10\n过期内容下架" as UC10
+  }
+  package "智能问答" {
+    usecase "UC-11\n自然语言提问" as UC11
+    usecase "UC-12\n多轮澄清" as UC12
+    usecase "UC-13\n引用来源与原文定位" as UC13
+    usecase "UC-14\n场景筛选" as UC14
+    usecase "UC-15\n未命中转人工" as UC15
+    usecase "UC-16\n答案反馈" as UC16
+  }
+  package "活动服务" {
+    usecase "UC-17\n赛程与报名信息查询" as UC17
+    usecase "UC-18\n场地地图导航" as UC18
+    usecase "UC-19\n订阅提醒推送" as UC19
+  }
+  package "运营与评测" {
+    usecase "UC-20\n问答质量看板" as UC20
+    usecase "UC-21\n评测集管理" as UC21
+    usecase "UC-22\n敏感内容审核" as UC22
+  }
+}
+
+' 登录
+User --> UC01
+Organizer --> UC01
+KBAdmin --> UC01
+SysAdmin --> UC01
+UC01 --> IdP
+
+' 账号与权限
+Visitor --> UC02
+User --> UC04
+SysAdmin --> UC03
+
+' 知识采集与治理
+Organizer --> UC05
+UC05 ..> UC08 : <<include>>
+User --> UC06
+KBAdmin --> UC07
+UC07 ..> UC08 : <<include>>
+KBAdmin --> UC09
+KBAdmin --> UC10
+Timer --> UC10
+
+' 智能问答
+User --> UC11
+UC11 ..> UC13 : <<include>>
+UC11 --> LLM
+UC12 ..> UC11 : <<extend>>
+UC14 ..> UC11 : <<extend>>
+UC15 ..> UC11 : <<extend>>
+UC16 ..> UC11 : <<extend>>
+UC06 ..> UC11 : <<extend>>
+
+' 活动服务
+User --> UC17
+Visitor --> UC17
+UC17 ..> UC18 : <<extend>>
+UC18 --> Map
+User --> UC19
+UC19 --> Push
+
+' 运营与评测
+KBAdmin --> UC20
+KBAdmin --> UC21
+KBAdmin --> UC22
+@enduml
