@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 项目 README
+    url: https://github.com/fan750/RAG-SchoolAssistant/blob/main/README.md
+    about: 项目章程、工程规范与团队分工
