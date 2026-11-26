@@ -16,6 +16,7 @@ actor "地图服务" as Map <<external>>
 actor "消息推送" as Push <<external>>
 actor "大模型服务" as LLM <<external>>
 actor "定时任务" as Timer
+actor "视觉模型服务" as Vision <<external>>
 
 rectangle "校园学习生活信息问答系统" {
   package "账号与权限" {
@@ -25,6 +26,8 @@ rectangle "校园学习生活信息问答系统" {
     usecase "UC-04\n问答历史管理" as UC04
   }
   package "知识采集与治理" {
+    usecase "UC-23\n网页定时抓取" as UC23
+    usecase "UC-24\n海报图信息抽取" as UC24
     usecase "UC-05\n活动 / 讲座发布" as UC05
     usecase "UC-06\n信息纠错提交" as UC06
     usecase "UC-07\n文档批量导入" as UC07
@@ -73,6 +76,11 @@ UC07 ..> UC08 : <<include>>
 KBAdmin --> UC09
 KBAdmin --> UC10
 Timer --> UC10
+Timer --> UC23
+UC23 ..> UC08 : <<include>>
+UC23 ..> UC24 : <<extend>>
+UC24 --> Vision
+KBAdmin --> UC24
 
 ' 智能问答
 User --> UC11
